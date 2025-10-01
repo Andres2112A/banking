@@ -83,12 +83,21 @@ WSGI_APPLICATION = 'banking.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'HOST': env('SB_HOST'),
+        'NAME': env('SB_NAME'),
+        'USER' : env('SB_USER'),
+        'PASSWORD' : env('SB_PASSWORD'),
+        'PORT': env('SB_PORT'),        
+        },
+
+    'p': {
+        'ENGINE': 'django.db.backends.postgresql',
         'HOST': env('DB_HOST', default = 'localhost'),
         'NAME': env('DB_NAME'),
         'USER' : env('DB_USER'),
         'PASSWORD' : env('DB_PASSWORD'),
         'PORT': env('DB_PORT', default = '5432'),        
-        },
+        },    
     
     'local': {
         'ENGINE': 'django.db.backends.sqlite3',
