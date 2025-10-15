@@ -1,38 +1,20 @@
-from django.db import models
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Country
+from .forms import CountryForm
 
 # Create your models here.
-class Country(models.Model):
-    name = models.CharField(max_length=100)
-    abreviation = models.CharField(max_length=10, blank=True, null=True)
-    status = models.BooleanField(default=True, blank=True)
-    def __file__(self):
-        return f"{self.name} {self.abreviation} {'Activate' if self.status else 'inactive'}"
-    
-class Departament(models.Model):
-    name = models.CharField(max_length=100)
-    abreviation = models.CharField(max_length=10, blank=True, null=True)
-    id_country = models.ForeignKey("Country", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True,null=True)
-    
-class City(models.Model):
-    id_department = models.ForeignKey("Departament", on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    abreviation = models.CharField(max_length=10, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class User(models.Model):
-    firstname = models.CharField(max_length=20)
-    lastname = models.CharField(max_length=20, blank=True)
-    mobile_phone = models.CharField(max_length=20, blank=True)
-    address = models.CharField(max_length=255, blank=True)
-    email = models.EmailField(unique=True)
-    password = models.TextField()
-    id_city = models.ForeignKey("City", on_delete=models.SET_NULL, null=True)
-    status = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-
+def country_list(request):
+    countries = Country.objects.all().order_by('name')
+    return render(request, 'banking_app/country_list.html', {'countries': countries})
+def country_edit(request, pk):
+    country = get_object_or_404(Country, pk=pk)
+    if request.method == 'POST':
+        form = CountryForm(request.POST, instance=country)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'País actualizado correctamente.')
+            return redirect('country_list')
+    else:
+        form = CountryForm(instance=country)
+    return render(request, 'banking_app/country_form.html', {'form': form, 'country': country})
